@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=&#34;auto&#34;>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.png">
+  <link rel="icon" type="image/png" href="/img/favicon.png">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="liubing">
+  <meta name="keywords" content="">
+  <title>Haproxy编译安装 - BING</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4.0.0/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10.4.0/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+  
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"onlypost":false},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null}}};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>LIUBING</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/links/">
+                <i class="iconfont icon-link-fill"></i>
+                友链
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;</a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" href="javascript:">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/post_banner.jpg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="Haproxy编译安装">
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-02-13 19:54" pubdate>
+        2021年2月13日 晚上
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      1.6k 字
+    </span>
+  
+
+  
+    
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      26
+       分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">Haproxy编译安装</h1>
+            
+            <div class="markdown-body">
+              <blockquote>
+<p>本文由 BING 用户授权转载，版权归原作者所有。</p>
+<p>本文作者：BING<br>原文地址：</p>
+</blockquote>
+<h2 id="安装环境"><a href="#安装环境" class="headerlink" title="安装环境"></a>安装环境</h2><blockquote>
+<p>由于 centos 自带的 lua 版本比较低并不符合 HAProxy 要求的 lua 最低版<br>本(5.3)的要求，因此需要编译安装较新版本 lua 环境，然后才能编译安装 HAProxy。</p>
+<p><a target="_blank" rel="noopener" href="http://www.haproxy.org/">http://www.haproxy.org</a></p>
+<p><a target="_blank" rel="noopener" href="https://www.lua.org/ftp/lua-5.3.5.tar.gz">https://www.lua.org/ftp/lua-5.3.5.tar.gz</a></p>
+</blockquote>
+<p>HAProxy 支持基于 lua 实现功能扩展，lua 是一种小巧的脚本语言，于 1993<br>年由巴西里约热内卢天主教大学(Pontifical Catholic University of Rio de Janeiro)<br>里的一个研究小组开发，其设计目的是为了嵌入应用程序中，从而为应用程序提供灵活的<br>扩展和定制功能。lua 具有以下特点：</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs coffeescript">游戏开发<br>独立应用脚本<br>Web 应用脚本<br>扩展和数据库插件，如 MySQL <span class="hljs-built_in">Proxy</span><br>安全系统，如入侵检测系统<br></code></pre></td></tr></table></figure>
+<h2 id="编译安装过程"><a href="#编译安装过程" class="headerlink" title="编译安装过程"></a>编译安装过程</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta">#</span><span class="bash"> 为了编译lua5.3.5安装依赖 <span class="hljs-comment"># 为了编译HAProxy，安装依赖</span></span><br>[root@localhost ~]# yum install libtermcap-devel ncurses-devel libevent-devel readline-devel -y<br>[root@localhost ~]# yum install gcc gcc-c++ glibc glibc-devel pcre pcre-devel openssl  openssl-devel systemd-devel net-tools vim iotop bc  zip unzip zlib-devel lrzsz tree screen lsof  -y<br><span class="hljs-meta">#</span><span class="bash"> 准备lua源码</span><br>[root@localhost ~]# wget https://www.lua.org/ftp/lua-5.3.5.tar.gz<br>[root@localhost ~]# tar -xvf /data/lua-5.3.5.tar.gz -C /usr/local/src/<br><br><span class="hljs-meta">#</span><span class="bash"> 编译</span><br>[root@localhost ~]# cd /usr/local/src/lua-5.3.5<br>[root@localhost lua-5.3.5]# make linux<br><br>[root@localhost lua-5.3.5]# ./src/lua -v<br>Lua 5.3.5  Copyright (C) 1994-2018 Lua.org, PUC-Rio<br><br><span class="hljs-meta">#</span><span class="bash"> 准备HAProxy源码 提前下载 haproxy-2.2.8.tar.gz 或是wget</span><br>[root@localhost ~]# tar xf haproxy-2.2.8.tar.gz  -C /usr/local/src/<br>[root@localhost ~]# cd /usr/local/src/haproxy-2.2.8<br><br><span class="hljs-meta">#</span><span class="bash"> 编译</span><br>[root@localhost haproxy-2.2.8]# make  ARCH=x86_64 TARGET=linux-glibc  USE_PCRE=1 USE_OPENSSL=1 USE_ZLIB=1   USE_SYSTEMD=1  USE_CPU_AFFINITY=1 LUA_INC=/usr/local/src/lua-5.3.5/src/ LUA_LIB=/usr/local/src/lua-5.3.5/src/ PREFIX=/usr/local/haproxy<br>[root@localhost haproxy-2.2.8]# make install PREFIX=/usr/local/haproxy<br><br><span class="hljs-meta">#</span><span class="bash"> 查看版本</span><br>[root@localhost haproxy-2.2.8]#/usr/local/haproxy/sbin/haproxy -v<br>HA-Proxy version 2.2.8-7bf78d7 2021/01/13 - https://haproxy.org/<br>Status: long-term supported branch - will stop receiving fixes around Q2 2025.<br>Known bugs: http://www.haproxy.org/bugs/bugs-2.2.8.html<br>Running on: Linux 3.10.0-862.el7.x86_64 #1 SMP Fri Apr 20 16:44:24 UTC 2018 x86_64<br><span class="hljs-meta">#</span><span class="bash"> 创建软连接</span><br>[root@localhost haproxy-2.2.8]# ln -s /usr/local/haproxy/sbin/haproxy  /usr/sbin/haproxy<br>[root@localhost haproxy-2.2.8]# ll /usr/sbin/haproxy<br>lrwxrwxrwx 1 root root 31 Feb  8 02:27 /usr/sbin/haproxy -&gt; /usr/local/haproxy/sbin/haproxy<br>[root@localhost haproxy-2.2.8]# <br><span class="hljs-meta">#</span><span class="bash">  修改时区</span><br>[root@localhost haproxy-2.2.8]# ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime<br></code></pre></td></tr></table></figure>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs awk"><span class="hljs-comment"># 若没有指定安装目录会默认安装在 </span><br>[root@localhost haproxy-<span class="hljs-number">2.2</span>.<span class="hljs-number">8</span>]<span class="hljs-comment"># make install </span><br>‘haproxy’ -&gt; ‘<span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/sbin/</span>haproxy’<br>‘doc<span class="hljs-regexp">/haproxy.1’ -&gt; ‘/u</span>sr<span class="hljs-regexp">/local/</span>share<span class="hljs-regexp">/man/m</span>an1/haproxy.<span class="hljs-number">1</span>’<br>install: creating directory ‘<span class="hljs-regexp">/usr/</span>local/doc’<br>install: creating directory ‘<span class="hljs-regexp">/usr/</span>local<span class="hljs-regexp">/doc/</span>haproxy’<br></code></pre></td></tr></table></figure>
+<h5 id="haproxy-默认是没有创建配置文件和log文件，需要手动创建"><a href="#haproxy-默认是没有创建配置文件和log文件，需要手动创建" class="headerlink" title="haproxy 默认是没有创建配置文件和log文件，需要手动创建"></a>haproxy 默认是没有创建配置文件和log文件，需要手动创建</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@localhost haproxy-2.2.8]# mkdir  -p  /usr/local/haproxy/conf<br>[root@localhost haproxy-2.2.8]# mkdir  /usr/local/haproxy/logs<br><br><span class="hljs-meta">#</span><span class="bash"> 拷贝安装包给的配置文件例子</span><br>[root@localhost haproxy-2.2.8]# cp examples/option-http_proxy.cfg /usr/local/haproxy/conf/haproxy.cfg<br>[root@localhost system]# ls /usr/local/haproxy/conf/<br>haproxy.cfg<br>[root@localhost system]#<br></code></pre></td></tr></table></figure>
+<h2 id="配置日志输出文件"><a href="#配置日志输出文件" class="headerlink" title="配置日志输出文件"></a>配置日志输出文件</h2><p><code>rsyslog是linux系默认的日志输出系统，配置文件为/etc/rsyslog.conf， 此主配置文件默认会读取/etc/rsyslog.d/*.conf目录下所有已.conf结尾的文件</code></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@localhost haproxy-2.2.8]# cat /etc/rsyslog.conf | grep -Ev &quot;^#|^$&quot;<br><span class="hljs-meta">$</span><span class="bash">ModLoad imuxsock <span class="hljs-comment"># provides support for local system logging (e.g. via logger command)</span></span><br><span class="hljs-meta">$</span><span class="bash">ModLoad imjournal <span class="hljs-comment"># provides access to the systemd journal</span></span><br><span class="hljs-meta">$</span><span class="bash">WorkDirectory /var/lib/rsyslog</span><br><span class="hljs-meta">$</span><span class="bash">ActionFileDefaultTemplate RSYSLOG_TraditionalFileFormat</span><br><span class="hljs-meta">$</span><span class="bash">IncludeConfig /etc/rsyslog.d/*.conf <span class="hljs-comment">#配置其他应用的日志，系统会到这个目录里读取</span></span><br><span class="hljs-meta">$</span><span class="bash">OmitLocalLogging on</span><br><span class="hljs-meta">$</span><span class="bash">IMJournalStateFile imjournal.state</span><br>*.info;mail.none;authpriv.none;cron.none                /var/log/messages<br>authpriv.*                                              /var/log/secure<br>mail.*                                                  -/var/log/maillog<br>cron.*                                                  /var/log/cron<br>*.emerg                                                 :omusrmsg:*<br>uucp,news.crit                                          /var/log/spooler<br>local7.*                                                /var/log/boot.log<br></code></pre></td></tr></table></figure>
+<h5 id="创建配置文件-haproxy-conf"><a href="#创建配置文件-haproxy-conf" class="headerlink" title="创建配置文件 haproxy.conf"></a>创建配置文件 <code>haproxy.conf</code></h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@localhost haproxy-2.2.8]# vim /etc/rsyslog.d/haproxy.conf<br>[root@localhost haproxy-2.2.8]#  ls /etc/rsyslog.d/<br>haproxy.conf  listen.conf<br>[root@localhost haproxy-2.2.8]#  more /etc/rsyslog.d/haproxy.conf<br><span class="hljs-meta">$</span><span class="bash">ModLoad imudp</span><br><span class="hljs-meta">$</span><span class="bash">UDPServerRun 514</span><br>local0.*     /usr/local/haproxy/logs/haproxy.log<br>&amp;~<br>[root@localhost haproxy-2.2.8]# <br><br><span class="hljs-meta">$</span><span class="bash">ModLoad imudp     <span class="hljs-comment"># 加载这个模板支持udp协议</span></span><br><span class="hljs-meta">$</span><span class="bash">UDPServerRun 514  <span class="hljs-comment">#514端口接收udp协议发来的日志</span></span><br>local3.*     /usr/local/haproxy/logs/haproxy.log  #local3.*  所有日志输出的级别<br>&amp;~ #如果不加这个配置，则除了在/var/log/haproxy.log中写入日志外，也会将haproxy日志写入message文件中。<br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>打开<code>/etc/sysconfig/rsyslog</code> 进行修改<code>SYSLOGD_OPTIONS</code>如下内容：</p>
+<p>SYSLOGD_OPTIONS=”-c 2 -r -m 0″<br>其中：<br>-c 2 使用兼容模式，默认是 -c 5。<br>-r 开启远程日志。<br>-m 0 标记时间戳。单位是分钟，为0时，表示禁用该功能。</p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@localhost haproxy-2.2.8]# vim /etc/sysconfig/rsyslog<br><span class="hljs-meta">#</span><span class="bash"> Options <span class="hljs-keyword">for</span> rsyslogd</span><br><span class="hljs-meta">#</span><span class="bash"> Syslogd options are deprecated since rsyslog v3.</span><br><span class="hljs-meta">#</span><span class="bash"> If you want to use them, switch to compatibility mode 2 by <span class="hljs-string">&quot;-c 2&quot;</span></span><br><span class="hljs-meta">#</span><span class="bash"> See rsyslogd(8) <span class="hljs-keyword">for</span> more details</span><br>SYSLOGD_OPTIONS=&quot;-c 2 -r -m 0&quot;<br></code></pre></td></tr></table></figure>
+<h5 id="重启"><a href="#重启" class="headerlink" title="重启"></a>重启</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs sh">systemctl  restart rsyslog<br></code></pre></td></tr></table></figure>
+<h5 id="配置haproxy-配置文件"><a href="#配置haproxy-配置文件" class="headerlink" title="配置haproxy 配置文件"></a>配置haproxy 配置文件</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment">#</span><br><span class="hljs-comment"># demo config for Proxy mode</span><br><span class="hljs-comment"># </span><br><br><span class="hljs-keyword">global</span><br>        maxconn         <span class="hljs-number">1024</span><br>        ulimit-n        <span class="hljs-number">2065</span><br>        log             <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span> local0 info<br>        user             nobody<br>        group            nobody<br>        chroot          /var/empty<br>        nbproc          <span class="hljs-number">1</span><br>        daemon<br>        pidfile /run/haproxy.pid<br>defaults<br>        mode http<br>retries <span class="hljs-number">3</span><br>        timeout connect 10s<br>        timeout client 20s<br>        timeout server 30s<br>        timeout check 5s<br>frontend www<br>         bind *:<span class="hljs-number">80</span><br>         mode   http<br>         option  httplog<br>         option  forwardfor<br>         option  httpclose<br>         log     <span class="hljs-keyword">global</span><br>         default_backend htmpool<br>backend htmpool<br>        mode    http<br>        option   redispatch<br>        option   abortonclose<br>        balance  roundrobin<br>        cookie   SERVERID<br>        option   httpchk GET /index.html<br>        server  web1 <span class="hljs-number">192.168</span><span class="hljs-number">.4</span><span class="hljs-number">.23</span>:<span class="hljs-number">80</span>  cookie server1 weight <span class="hljs-number">6</span> check inter <span class="hljs-number">2000</span> rise <span class="hljs-number">2</span> fall <span class="hljs-number">3</span><br>        server  web2 <span class="hljs-number">192.168</span><span class="hljs-number">.4</span><span class="hljs-number">.24</span>:<span class="hljs-number">80</span>  cookie server2 weight <span class="hljs-number">6</span> check inter <span class="hljs-number">2000</span> rise <span class="hljs-number">2</span> fall <span class="hljs-number">3</span><br>listen admin_stats<br>        bind <span class="hljs-number">0.0</span><span class="hljs-number">.0</span><span class="hljs-number">.0</span>:<span class="hljs-number">9188</span><br>        mode http<br>        log <span class="hljs-number">127.0</span><span class="hljs-number">.0</span><span class="hljs-number">.1</span> local0 err<br>        stats refresh 30s<br>        stats uri /haproxy-status<br>        stats realm welcome login\ Haproxy<br>        stats auth admin:admin~!@<br>        stats hide-version<br>        stats admin <span class="hljs-keyword">if</span> TRUE<br><br></code></pre></td></tr></table></figure>
+<h5 id="启动haproxy"><a href="#启动haproxy" class="headerlink" title="启动haproxy"></a>启动haproxy</h5><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs sh">[root@localhost conf]<span class="hljs-comment"># pwd</span><br>/usr/<span class="hljs-built_in">local</span>/haproxy/conf<br>[root@localhost conf]<span class="hljs-comment"># haproxy -f /usr/local/haproxy/conf/haproxy.cfg</span><br></code></pre></td></tr></table></figure>
+<h5 id="使用systemctl-管理启动haproxy脚本"><a href="#使用systemctl-管理启动haproxy脚本" class="headerlink" title="使用systemctl 管理启动haproxy脚本"></a>使用<code>systemctl</code> 管理启动<code>haproxy</code>脚本</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs shell">[root@localhost haproxy]# vim /usr/lib/systemd/system/haproxy.service<br>[Unit]<br>Description=HAProxy Load Balancer<br>After=syslog.target network.target<br><br>[Service]<br>Environment=&quot;CONFIG=/usr/local/haproxy/conf/haproxy.cfg&quot;<br>ExecStartPre=/usr/sbin/haproxy -f $CONFIG  -c -q<br>ExecStart=/usr/sbin/haproxy -Ws -f $CONFIG  -p /run/haproxy.pid<br>ExecReload=/bin/kill -USR2 $MAINPID<br>KillMode=mixed<br>Type=notify<br><br>[Install]<br>WantedBy=multi-user.target<br><br><span class="hljs-meta">#</span><span class="bash"> 进行重新加载，并重新启动haproxy服务</span><br>[root@localhost haproxy]# systemctl daemon-reload<br>[root@localhost haproxy]# systemctl restart haproxy.service <br>[root@localhost haproxy]# systemctl status haproxy.service <br>● haproxy.service - HAProxy Load Balancer<br>   Loaded: loaded (/usr/lib/systemd/system/haproxy.service; disabled; vendor preset: disabled)<br>   Active: active (running) since Mon 2021-02-08 15:46:05 CST; 10s ago<br><br></code></pre></td></tr></table></figure>
+<h5 id="定义监控界面段介绍；访问http-192-168-4-21-9188-haproxy-status"><a href="#定义监控界面段介绍；访问http-192-168-4-21-9188-haproxy-status" class="headerlink" title="定义监控界面段介绍；访问http://192.168.4.21:9188/haproxy-status"></a>定义监控界面段介绍；访问<a target="_blank" rel="noopener" href="http://192.168.4.21:9188/haproxy-status">http://192.168.4.21:9188/haproxy-status</a></h5><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs awk">frontend  secure <span class="hljs-regexp">//</span>自定义一个frontend，也可以放在listen或者backend中<br>       bind *:<span class="hljs-number">8888</span>   <span class="hljs-regexp">//</span>监听的ip端口号<br>       stats enable    <span class="hljs-regexp">//</span>开关<br>       stats  uri  <span class="hljs-regexp">/admin?admin  /</span><span class="hljs-regexp">/访问的uri   ip:8888/</span>admin?admin<br>       stats auth admin:admin    <span class="hljs-regexp">//</span>认证用户名和密码<br>       stats hide-version        <span class="hljs-regexp">//</span>隐藏HAProxy的版本号<br>       stats admin <span class="hljs-keyword">if</span> TRUE       <span class="hljs-regexp">//</span>管理界面，如果认证成功了，可通过webui管理节点<br>       stats  refresh  <span class="hljs-number">30</span>s   <span class="hljs-regexp">//</span>统计页面自动刷新时间<br></code></pre></td></tr></table></figure>
+<p><img src="/img/haproxy-status.png" srcset="/img/loading.gif"></p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                  <div class="post-meta mr-3">
+                    <i class="iconfont icon-category"></i>
+                    
+                      <a class="hover-with-bg" href="/categories/haproxy/">haproxy</a>
+                    
+                  </div>
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Haproxy/">Haproxy</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！</p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/02/13/Shell%E5%90%AF%E5%8A%A8%E5%9B%BE%E5%83%8F/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">shell 启动图像</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/02/13/centos%E6%9C%80%E5%B0%8F%E5%8C%96%E5%AE%89%E8%A3%85%E5%90%8E%E4%BC%98%E5%8C%96/">
+                        <span class="hidden-mobile">centos最小化安装后优化</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+<!-- SCRIPTS -->
+
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/debouncer.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  
+    <script  src="/js/lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/tocbot@4.12.0/dist/tocbot.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js" ></script>
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4.3.0/anchor.min.js" ></script>
+
+
+
+  <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js" ></script>
+
+
+
+
+
+
+  <script  src="https://cdn.jsdelivr.net/npm/typed.js@2.0.11/lib/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var title = document.getElementById('subtitle').title;
+      
+      typing(title)
+      
+    })(window, document);
+  </script>
+
+
+
+  <script  src="/js/local-search.js" ></script>
+  <script>
+    (function () {
+      var path = "/local-search.xml";
+      var inputArea = document.querySelector("#local-search-input");
+      inputArea.onclick = function () {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+        this.onclick = null
+      }
+    })()
+  </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+
+</body>
+</html>
